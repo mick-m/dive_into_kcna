@@ -40,14 +40,14 @@ alpine                                    latest                                
  => => naming to docker.io/mmcarthy/cmatrix:latest                                                                                0.0s
  => => unpacking to docker.io/mmcarthy/cmatrix:latest                                                                             0.0s
 ```
-4. Connect to container (Alpine doesn't include Bash. Use 'sh' instead:
+4. Connect to container (Alpine doesn't include Bash. Use 'sh' instead):
 ```
 docker run --rm -it mmcarthy/cmatrix sh
 ```
 - -it = interactive terminal
 - --rm = will automatically remove container on exit
 
-5. We need to clone source code. Alpine won't contain Git by default:
+5. Clone the  source code. Alpine distro won't contain Git by default:
 ```
 apk update
 apk add git
@@ -90,13 +90,10 @@ make
 
 - v1: Included initial Dockerfile (Dockerfile_13_layers) that's far from optimized (too many layers and file is very large)
 ```
-```
 docker images
 REPOSITORY                                TAG                                                                           IMAGE ID       CREATED              SIZE
 mmcarthy/cmatrix                          latest                                                                        1f6a70f49634   About a minute ago   450MB
 ```
-```
-
 - v2: Optimized to 3 layers (Dockerfile_3_layers)
       - Still running as root user:
       ```
