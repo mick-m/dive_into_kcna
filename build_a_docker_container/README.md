@@ -1,10 +1,10 @@
-# Example of how to build  a docker container
+# Build a docker container
 
 source: https://github.com/spurin/cmatrix/blob/master/compilation_steps_in_alpine_container.md
 
 ## 1. Build container manually to test it works as expected
 
-1. Source a small Docker image to build with - e.g. Alpine linux (usually < 10MB)
+#  Source a small Docker image to build with - e.g. Alpine linux (usually < 10MB)
 ```
 docker pull alpine
 Using default tag: latest
@@ -19,9 +19,9 @@ docker images | grep alpine
 alpine                                    latest                                                                        8a1f59ffb675   6 weeks ago     13.3MB
 ```
 
-2. Create a Dockerfile (see 'cmatrix' directory)
+# Create a Dockerfile (see 'cmatrix' directory)
 
-3. Build a container and test manual setup prior to automation (from directory containing the Dockerfile):
+# Build a container to test manual setup prior to automation (from directory containing the Dockerfile):
 ```
 [+] Building 0.1s (5/5) FINISHED                                                                                  docker:desktop-linux
  => [internal] load build definition from Dockerfile                                                                              0.0s
@@ -40,7 +40,7 @@ alpine                                    latest                                
  => => naming to docker.io/mmcarthy/cmatrix:latest                                                                                0.0s
  => => unpacking to docker.io/mmcarthy/cmatrix:latest                                                                             0.0s
 ```
-4. Connect to container (Alpine doesn't include Bash. Use 'sh' instead):
+#  Connect to the container for manual packages install / compilation  (NB: Alpine doesn't include Bash. Use 'sh' instead):
 ```
 docker run --rm -it mmcarthy/cmatrix sh
 ```
@@ -58,7 +58,7 @@ cd cmatrix/
 ```
 - APK = Alpine Package Keeper
 
-6. Also to be run inside the container:
+# Also to be run inside the container:
 ```
 # Install autoconf
 apk add autoconf
@@ -86,8 +86,10 @@ make
 ./cmatrix
 ```
 
-## 2. Package steps in a Dockerfile
+## 2. After successful build, package steps into a Dockerfile for automated install
 
+
+# Dockerfile examples included in this repo:
 - v1: Included initial Dockerfile (Dockerfile_13_layers) that's far from optimized (too many layers and file is very large)
 ```
 docker images
@@ -116,14 +118,14 @@ mmcarthy/cmatrix                          latest                                
 docker build . -t mmcarthy/cmatrix
 ```
 
-# 4.Running the container
+## 4.Running the container
 
-Default:
+# Default:
 ```
 docker run --rm -it mmcarthy/cmatrix
 ```
 
-Using parameters (v4):
+# Using parameters (v4):
 ```
  docker run --rm -it mmcarthy/cmatrix --help
  Usage: cmatrix -[abBcfhlsmVxk] [-u delay] [-C color] [-t tty] [-M message]
@@ -149,7 +151,7 @@ Using parameters (v4):
  -t [tty]: Set tty to use
 ```
 
-Run with custom parameters:
+# Run with custom parameters:
 ```
 docker run --rm -it mmcarthy/cmatrix -ab -u 2 -C magenta
 ```
