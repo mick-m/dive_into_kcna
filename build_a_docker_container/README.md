@@ -1,5 +1,9 @@
 # Example of how to build  a docker container
 
+source: https://github.com/spurin/cmatrix/blob/master/compilation_steps_in_alpine_container.md
+
+## 1. Build container manually to test it works as expected
+
 1. Source a small Docker image to build with - e.g. Alpine linux (usually < 10MB)
 ```
 docker pull alpine
@@ -48,11 +52,107 @@ docker run --rm -it mmcarthy/cmatrix sh
 apk update
 apk add git
 git clone https://github.com/spurin/cmatrix.git
+
+# Change to the cmatrix source code and view the code
+cd cmatrix/
 ```
 - APK = Alpine Package Keeper
 
-6. Other things that are needed:
+6. Also to be run inside the container:
 ```
+# Install autoconf
 apk add autoconf
+
+# Install automake
 apk add automake
+
+# Install dependencies and create missing directories
+apk add ncurses-dev ncurses-static
+mkdir -p /usr/lib/kbd/consolefonts /usr/share/consolefonts
+
+# Install compiler
+apk add alpine-sdk
+
+# Prepare compilation
+autoreconf -i
+
+# build a static binary
+./configure LDFLAGS="-static"
+
+# make to compile
+make
+
+# run
+./cmatrix
+```
+
+## 2. Package steps in a Dockerfile
+
+- v1: Included initial Dockerfile (Dockerfile_13_layers) that's far from optimized (too many layers and file is very large)
+```
+```
+docker images
+REPOSITORY                                TAG                                                                           IMAGE ID       CREATED              SIZE
+mmcarthy/cmatrix                          latest                                                                        1f6a70f49634   About a minute ago   450MB
+```
+```
+
+- v2: Optimized to 3 layers (Dockerfile_3_layers)
+      - Still running as root user:
+      ```
+      docker run --rm -it mmcarthy/cmatrix whoami
+      root
+      ```
+- v3: Dockerfile_multi: Multi-step build process to reduce container size
+      - and --no-cache for apk to further  reduce container size
+      - added non-root user (-D to disable password, -H to not create a home directory)
+      ```
+      $ docker images
+      REPOSITORY                                TAG                                                                           IMAGE ID       CREATED          SIZE
+      mmcarthy/cmatrix                          latest                                                                        3f2822acfcdd   13 minutes ago   20.1MB
+      ```
+
+- v4: Allow for parameters (Dockerfile)
+
+## 3. Build container from Dockerfile
+```
+docker build . -t mmcarthy/cmatrix
+```
+
+# 4.Running the container
+
+Default:
+```
+docker run --rm -it mmcarthy/cmatrix
+```
+
+Using parameters (v4):
+```
+ docker run --rm -it mmcarthy/cmatrix --help
+ Usage: cmatrix -[abBcfhlsmVxk] [-u delay] [-C color] [-t tty] [-M message]
+ -a: Asynchronous scroll
+ -b: Bold characters on
+ -B: All bold characters (overrides -b)
+ -c: Use Japanese characters as seen in the original matrix. Requires appropriate fonts
+ -f: Force the linux $TERM type to be on
+ -l: Linux mode (uses matrix console font)
+ -L: Lock mode (can be closed from another terminal)
+ -o: Use old-style scrolling
+ -h: Print usage and exit
+ -n: No bold characters (overrides -b and -B, default)
+ -s: "Screensaver" mode, exits on first keystroke
+ -x: X window mode, use if your xterm is using mtx.pcf
+ -V: Print version information and exit
+ -M [message]: Prints your message in the center of the screen. Overrides -L's default message.
+ -u delay (0 - 10, default 4): Screen update delay
+ -C [color]: Use this color for matrix (default green)
+ -r: rainbow mode
+ -m: lambda mode
+ -k: Characters change while scrolling. (Works without -o opt.)
+ -t [tty]: Set tty to use
+```
+
+Run with custom parameters:
+```
+docker run --rm -it mmcarthy/cmatrix -ab -u 2 -C magenta
 ```

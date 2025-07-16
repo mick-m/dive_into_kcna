@@ -1,0 +1,23 @@
+# DockerFile will follow OpenContainer standards: https://github.com/opencontainers/image-spec/blob/main/annotations.md
+
+# Instruct source image to use
+FROM alpine
+
+LABEL org.opencontainers.image.authors="Mick McCarthy <email@address.com>"
+LABEL org.opencontainers.image.description="Container image for https://github.com/abishekvashok/cmatrix"
+
+WORKDIR cmatrix
+
+RUN apk update
+RUN apk add git
+RUN git clone https://github.com/spurin/cmatrix.git . # dot ensures it doesn't change dir after clone
+RUN apk add autoconf
+RUN apk add automake
+RUN autoreconf -i
+RUN apk add alpine-sdk
+RUN apk add ncurses-dev ncurses-static
+RUN mkdir -p /usr/lib/kbd/consolefonts /usr/share/consolefonts
+RUN ./configure LDFLAGS="-static"
+RUN make
+
+CMD ["./cmatrix"]

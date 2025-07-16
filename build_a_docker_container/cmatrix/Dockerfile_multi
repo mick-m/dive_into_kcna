@@ -29,5 +29,4 @@ RUN apk update --no-cache && \
 COPY --from=cmatrixbuilder /cmatrix/cmatrix /cmatrix
 
 USER thomas
-ENTRYPOINT ["./cmatrix"]
-CMD ["-b"]
+CMD ["./cmatrix"]
